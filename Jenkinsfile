@@ -38,6 +38,25 @@ pipeline {
                 sh "docker images ${IMAGE_NAME}"
             }
         }
+        stage('Login to Docker Hub') {
+            steps {
+                echo 'Stage 4: Logging in to Docker Hub...'
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login \
+                        -u "$DOCKER_USERNAME" \
+                        --password-stdin
+                    '''
+                }
+            }
+        }
 
         stage('Deploy Container') {
             steps {
